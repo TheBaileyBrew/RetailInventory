@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="array_category_types">
+        <item>@string/please_choose_one</item>
+        <item>@string/games</item>
+        <item>@string/hardware</item>
+        <item>@string/accessories</item>
+        <item>@string/power</item>
+    </string-array>
+
+    <string-array name="array_supplier_types">
+        <item>@string/please_choose_one</item>
+        <item>@string/sony</item>
+        <item>@string/microsoft</item>
+        <item>@string/nintendo</item>
+    </string-array>
+
+
+</resources>

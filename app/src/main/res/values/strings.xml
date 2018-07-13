@@ -1,0 +1,40 @@
+<resources>
+    <string name="app_name">Retail Inventory</string>
+
+    <string name="lorum_ipsum">Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        Nullam euismod ex orci, sit amet scelerisque diam ornare eu. Pellentesque tempus finibus
+        fermentum. Vivamus quis sem et tellus luctus tristique. Pellentesque dapibus fringilla orci.
+        Suspendisse pellentesque sapien sed vulputate malesuada. Maecenas ac laoreet lorem.
+        Aliquam mollis fringilla metus, sit amet aliquam odio feugiat et. Quisque ac faucibus velit.
+        In mattis, nibh eget pulvinar maximus, ligula massa pretium neque, nec egestas nulla
+        felis sed mi. Etiam aliquet scelerisque semper. Phasellus in sapien vitae est tincidunt
+        semper nec ut magna.</string>
+
+    <string name="please_choose_one">Make A Selection</string>
+    <string name="games">GAMES</string>
+    <string name="hardware">CONSOLE</string>
+    <string name="accessories">ACCESSORIES</string>
+    <string name="power">POWER</string>
+    <string name="sony">SONY</string>
+    <string name="microsoft">MICROSOFT</string>
+    <string name="nintendo">NINTENDO</string>
+
+    <string name="sony_phone">1-800-345-7669</string>
+    <string name="sony_address">2207 Bridgepoint Parkway, San Mateo, CA</string>
+    <string name="microsoft_phone">1-877-696-7786</string>
+    <string name="microsoft_address">One Microsoft Way, Redmond, WA</string>
+    <string name="nintendo_phone">1-800-255-3700</string>
+    <string name="nintendo_address">445 Park Avenue, New York, NY</string>
+    <string name="action_save">Save</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_view_settings">Settings</string>
+    <string name="action_delete_all_entries">Delete All Entries</string>
+    <string name="quantity">QUANTITY</string>
+    <string name="plus">+</string>
+    <string name="minus">-</string>
+    <string name="zero">0</string>
+    <string name="price">Price</string>
+    <string name="product_name">Product Name</string>
+
+
+</resources>
