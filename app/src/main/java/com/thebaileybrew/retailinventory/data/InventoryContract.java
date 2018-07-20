@@ -1,5 +1,6 @@
 package com.thebaileybrew.retailinventory.data;
 
+import android.net.Uri;
 import android.provider.BaseColumns;
 
 public final class InventoryContract {
@@ -25,6 +26,17 @@ public final class InventoryContract {
         public final static String PRODUCT_SUPPLIER_PHONE = "phone";
         //Type: TEXT
         public final static String PRODUCT_SUPPLIER_ADDRESS = "address";
+
+        //Content Provider constants
+        public static final String CONTENT_AUTHORITY = "com.thebaileybrew.retailinventory";
+
+        public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
+
+        public static final String PATH_INVENTORY = "inventory";
+
+        public static final Uri CONTENT_URI = Uri.withAppendedPath(BASE_CONTENT_URI, PATH_INVENTORY);
+
+
 
         //Possible category types
         public static final int CATEGORY_GAME = 0;
