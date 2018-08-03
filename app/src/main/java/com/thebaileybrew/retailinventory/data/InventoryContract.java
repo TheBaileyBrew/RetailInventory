@@ -1,5 +1,6 @@
 package com.thebaileybrew.retailinventory.data;
 
+import android.content.ContentResolver;
 import android.net.Uri;
 import android.provider.BaseColumns;
 
@@ -9,7 +10,7 @@ public final class InventoryContract {
 
     public static final class InventoryEntry implements BaseColumns {
         //Database Table Name
-        public final static String TABLE_NAME = "inventory";
+        public final static String TABLE_NAME = "gameinventory";
         //Type: INTEGER
         public final static String _ID = BaseColumns._ID;
         //Type: TEXT
@@ -19,13 +20,8 @@ public final class InventoryContract {
         //Type: INTEGER
         public final static String PRODUCT_QTY = "quantity";
         //Type: INTEGER
-        public final static String PRODUCT_CATEGORY = "category";
-        //Type: INTEGER
-        public final static String PRODUCT_SUPPLIER = "supplier";
-        //Type: TEXT
-        public final static String PRODUCT_SUPPLIER_PHONE = "phone";
-        //Type: TEXT
-        public final static String PRODUCT_SUPPLIER_ADDRESS = "address";
+        public final static String PRODUCT_SYSTEM = "system";
+
 
         //Content Provider constants
         public static final String CONTENT_AUTHORITY = "com.thebaileybrew.retailinventory";
@@ -36,17 +32,32 @@ public final class InventoryContract {
 
         public static final Uri CONTENT_URI = Uri.withAppendedPath(BASE_CONTENT_URI, PATH_INVENTORY);
 
+        //MIME types
+        public static final String CONTENT_LIST_TYPE =
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_INVENTORY;
+        public static final String CONTENT_ITEM_TYPE =
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_INVENTORY;
+
 
 
         //Possible category types
-        public static final int CATEGORY_GAME = 0;
-        public static final int CATEGORY_HARDWARE = 1;
-        public static final int CATEGORY_ACCESSORY = 2;
-        public static final int CATEGORY_POWER = 3;
+        public static final int SYSTEM_PS3 = 0;
+        public static final int SYSTEM_PS4 = 1;
+        public static final int SYSTEM_XBOXONE = 2;
+        public static final int SYSTEM_N3DS = 3;
+        public static final int SYSTEM_NSWITCH = 4;
+        public static final int SYSTEM_UNKNOWN = 5;
 
-        //Possible supplier types
-        public static final int SUPPLIER_SONY = 0;
-        public static final int SUPPLIER_MICROSOFT = 1;
-        public static final int SUPPLIER_NINTENDO = 2;
+        public static boolean isValidSystem(int system) {
+            if (system == SYSTEM_PS3
+                    || system == SYSTEM_PS4
+                    || system == SYSTEM_XBOXONE
+                    || system == SYSTEM_N3DS
+                    || system == SYSTEM_NSWITCH) {
+                return true;
+            } else return false;
+        }
+
+
     }
 }

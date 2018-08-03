@@ -2,8 +2,12 @@ package com.thebaileybrew.retailinventory;
 
 import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.PorterDuff;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.TextInputEditText;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
@@ -25,10 +29,13 @@ import static com.thebaileybrew.retailinventory.data.InventoryContract.*;
 
 public class EditorActivity extends AppCompatActivity {
     private static final String TAG = EditorActivity.class.getSimpleName();
-
-    private EditText mProductName;
+    Boolean allValidData = false;
+    Boolean validName = false, validPrice = false, validQuantity = false;
+    private TextInputEditText mProductName;
+    private TextInputLayout mProductNameLayout;
     private Spinner mProductCategory;
-    private EditText mProductPrice;
+    private TextInputEditText mProductPrice;
+    private TextInputLayout mProductPriceLayout;
     private TextView mProductQuantity;
     private Spinner mProductSupplier;
     private TextView mProductSupplierPhone;
@@ -36,8 +43,7 @@ public class EditorActivity extends AppCompatActivity {
     private Button increaseQuantity;
     private Button decreaseQuantity;
 
-    private int mCategory = InventoryEntry.CATEGORY_GAME;
-    private int mSupplier = InventoryEntry.SUPPLIER_SONY;
+    private int mSystem = InventoryEntry.SYSTEM_PS3;
     private double mPrice = 0;
     private int mQuantity = 0;
 
@@ -48,12 +54,11 @@ public class EditorActivity extends AppCompatActivity {
         increaseQuantity = findViewById(R.id.increase_qty);
         decreaseQuantity = findViewById(R.id.decrease_qty);
         mProductName = findViewById(R.id.product_name_edit_text); //ET - String
+        mProductNameLayout = findViewById(R.id.product_name_layout);
         mProductCategory = findViewById(R.id.product_category_spinner); //Spinner - variable direct
         mProductPrice = findViewById(R.id.product_price_edit_text); //ET - String
+        mProductPriceLayout = findViewById(R.id.product_price_layout);
         mProductQuantity = findViewById(R.id.product_quantity_update); //TV - String
-        mProductSupplier = findViewById(R.id.product_supplier_name); //Spinner - variable direct
-        mProductSupplierPhone = findViewById(R.id.product_supplier_phone); //TV - String
-        mProductSupplierAddress = findViewById(R.id.product_supplier_address); //TV - String
 
         setupSpinner();
         increaseQty();
@@ -97,50 +102,23 @@ public class EditorActivity extends AppCompatActivity {
         categoryAdapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
         mProductCategory.setAdapter(categoryAdapter);
 
-        ArrayAdapter supplierAdapter = ArrayAdapter.createFromResource(this,
-                R.array.array_supplier_types, android.R.layout.simple_spinner_item);
-        supplierAdapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
-        mProductSupplier.setAdapter(supplierAdapter);
-
         mProductCategory.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 String selectedItem = (String) parent.getItemAtPosition(position);
                 if(!TextUtils.isEmpty(selectedItem)) {
-                    if(selectedItem.equals(getString(R.string.games))) {
-                        mCategory = InventoryEntry.CATEGORY_GAME;
-                    } else if (selectedItem.equals(getString(R.string.hardware))) {
-                        mCategory = InventoryEntry.CATEGORY_HARDWARE;
-                    } else if (selectedItem.equals(getString(R.string.accessories))) {
-                        mCategory = InventoryEntry.CATEGORY_ACCESSORY;
+                    if(selectedItem.equals(getString(R.string.sps3))) {
+                        mSystem = InventoryEntry.SYSTEM_PS3;
+                    } else if (selectedItem.equals(getString(R.string.sps4))) {
+                        mSystem = InventoryEntry.SYSTEM_PS4;
+                    } else if (selectedItem.equals(getString(R.string.mxbox))) {
+                        mSystem = InventoryEntry.SYSTEM_XBOXONE;
+                    } else if (selectedItem.equals(getString(R.string.n3ds))) {
+                        mSystem = InventoryEntry.SYSTEM_N3DS;
+                    } else if (selectedItem.equals(getString(R.string.nswitch))) {
+                        mSystem = InventoryEntry.SYSTEM_NSWITCH;
                     } else {
-                        mCategory = InventoryEntry.CATEGORY_POWER;
-                    }
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-        mProductSupplier.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                String selectedItem = (String) parent.getItemAtPosition(position);
-                if (!TextUtils.isEmpty(selectedItem)) {
-                    if (selectedItem.equals(getString(R.string.sony))) {
-                        mSupplier = InventoryEntry.SUPPLIER_SONY;
-                        mProductSupplierPhone.setText(getString(R.string.sony_phone));
-                        mProductSupplierAddress.setText(getString(R.string.sony_address));
-                    } else if (selectedItem.equals(getString(R.string.microsoft))) {
-                        mSupplier = InventoryEntry.SUPPLIER_MICROSOFT;
-                        mProductSupplierPhone.setText(getString(R.string.microsoft_phone));
-                        mProductSupplierAddress.setText(getString(R.string.microsoft_address));
-                    } else {
-                        mSupplier = InventoryEntry.SUPPLIER_NINTENDO;
-                        mProductSupplierPhone.setText(getString(R.string.nintendo_phone));
-                        mProductSupplierAddress.setText(getString(R.string.nintendo_address));
+                        mSystem = InventoryEntry.SYSTEM_UNKNOWN;
                     }
                 }
             }
@@ -153,34 +131,62 @@ public class EditorActivity extends AppCompatActivity {
     }
 
     private void insertInventory() {
+        //Validate product name
+        if(mProductName.getText().toString().trim().equalsIgnoreCase("")) {
+            mProductNameLayout.setError("This field cannot be blank");
+        } else if (!mProductName.getText().toString().trim().equalsIgnoreCase("Ghost Recon")) {
+            //TODO: Validate against JSON Query
+            mProductNameLayout.setError("Name must be a valid video game");
+        } else {
+            validName = true;
+        }
+
+        if (mProductPrice.getText().toString().trim().equalsIgnoreCase("")) {
+            mProductPriceLayout.setError("Cannot be blank");
+        } else if (!mProductPrice.getText().toString().matches("\\d{2}\\.\\d{2}")) {
+            mProductPriceLayout.setError("Must contain a valid price");
+        } else {
+            validPrice = true;
+        }
+
+        int quantity = Integer.parseInt(mProductQuantity.getText().toString());
+        if (mProductQuantity.getText().toString().trim().equalsIgnoreCase("0")) {
+            Toast.makeText(this, "Must have quantity greater than 1", Toast.LENGTH_SHORT).show();
+        } else if (quantity < 0) {
+            Toast.makeText(this, "Must not be less than 0", Toast.LENGTH_SHORT).show();
+        } else {
+            validQuantity = true;
+        }
+
+        if (validName && validPrice && validQuantity) {
+            allValidData = true;
+        }
+
+
+
+
         //Read from input
         String productName = mProductName.getText().toString().toUpperCase().trim();
         String productPrice = mProductPrice.getText().toString().trim();
-        String productSupplierAddress = mProductSupplierAddress.getText().toString();
-        String productSupplierPhone = mProductSupplierPhone.getText().toString();
         String productQuantity = mProductQuantity.getText().toString();
 
-        InventoryDbHelper mDbHelper = new InventoryDbHelper(this);
-
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
-
-        ContentValues values = new ContentValues();
-        values.put(InventoryEntry.PRODUCT_NAME, productName);
-        values.put(InventoryEntry.PRODUCT_PRICE, productPrice);
-        values.put(InventoryEntry.PRODUCT_QTY, productQuantity);
-        values.put(InventoryEntry.PRODUCT_CATEGORY, mCategory);
-        values.put(InventoryEntry.PRODUCT_SUPPLIER, mSupplier);
-        values.put(InventoryEntry.PRODUCT_SUPPLIER_PHONE, productSupplierPhone);
-        values.put(InventoryEntry.PRODUCT_SUPPLIER_ADDRESS, productSupplierAddress);
-
-        //Insert a new row for the equipment into the database, and return the ID of that row
-        long newRowId = db.insert(InventoryEntry.TABLE_NAME,null, values);
-
-        //Show toast depending on the success of insertion into database table
-        if(newRowId == -1) {
-            Toast.makeText(this, "Error saving item", Toast.LENGTH_SHORT).show();
+        if (allValidData) {
+            InventoryDbHelper mDbHelper = new InventoryDbHelper(this);
+            SQLiteDatabase db = mDbHelper.getWritableDatabase();
+            ContentValues values = new ContentValues();
+            values.put(InventoryEntry.PRODUCT_NAME, productName);
+            values.put(InventoryEntry.PRODUCT_PRICE, productPrice);
+            values.put(InventoryEntry.PRODUCT_QTY, productQuantity);
+            values.put(InventoryEntry.PRODUCT_SYSTEM, mSystem);
+            //Insert a new row for the equipment into the database, and return the ID of that row
+            Uri newUri = getContentResolver().insert(InventoryEntry.CONTENT_URI, values);
+            if (newUri == null) {
+                Toast.makeText(this, getString(R.string.editor_failed), Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, getString(R.string.editor_success), Toast.LENGTH_SHORT).show();
+            }
         } else {
-            Toast.makeText(this, "Item saved with row id: " + newRowId, Toast.LENGTH_SHORT).show();
+            return;
         }
 
     }
@@ -201,7 +207,9 @@ public class EditorActivity extends AppCompatActivity {
                 // Save pet to database
                 insertInventory();
                 // Exit activity
-                finish();
+                if (allValidData) {
+                    finish();
+                }
                 return true;
             // Respond to a click on the "Delete" menu option
             case R.id.action_delete:

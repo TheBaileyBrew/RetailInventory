@@ -3,4 +3,18 @@
     <color name="colorPrimary">#303030</color>
     <color name="colorPrimaryDark">#000000</color>
     <color name="colorAccent">#3765DB</color>
+    <color name="colorAccentRed">#db373c</color>
+
+    <color name="colorFade">#783765db</color>
+
+    <color name="gradient_start">#85FFFFFF</color>
+    <color name="gradient_end">#FFFFFF</color>
+    <color name="gradient_start_bottom_ps3">#783765DB</color>
+    <color name="gradient_end_bottom">#55FFFFFF</color>
+
+
+    <color name="gradient_start_bottom_ps4">#78db6537</color>
+    <color name="gradient_start_bottom_xbone">#7837dbc8</color>
+    <color name="gradient_start_bottom_3ds">#78a437db</color>
+    <color name="gradient_start_bottom_switch">#7845db37</color>
 </resources>

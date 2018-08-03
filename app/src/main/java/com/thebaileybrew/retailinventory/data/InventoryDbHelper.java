@@ -13,7 +13,7 @@ public class InventoryDbHelper extends SQLiteOpenHelper {
     public static final String TAG = InventoryDbHelper.class.getSimpleName();
 
     /* Name of the Database file */
-    private static final String DATABASE_NAME = "inventory.db";
+    private static final String DATABASE_NAME = "gameinventory.db";
 
     /* Database version. If schema is changed, the version must be incremented */
     private static final int DATABASE_VERSION = 1;
@@ -33,17 +33,14 @@ public class InventoryDbHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
 
         //String containing the SQL statement to create the mobile table in the database
-        String SQL_CREATE_MOBILE_TABLE = "CREATE TABLE " + InventoryEntry.TABLE_NAME + " ("
+        String SQL_CREATE_GAME_TABLE = "CREATE TABLE " + InventoryEntry.TABLE_NAME + " ("
                 + InventoryEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + InventoryEntry.PRODUCT_NAME + " TEXT NOT NULL, "
                 + InventoryEntry.PRODUCT_PRICE + " REAL, "
                 + InventoryEntry.PRODUCT_QTY + " INTEGER NOT NULL DEFAULT 0, "
-                + InventoryEntry.PRODUCT_CATEGORY + " INTEGER, "
-                + InventoryEntry.PRODUCT_SUPPLIER + " INTEGER, "
-                + InventoryEntry.PRODUCT_SUPPLIER_PHONE + " TEXT, "
-                + InventoryEntry.PRODUCT_SUPPLIER_ADDRESS + " TEXT);";
+                + InventoryEntry.PRODUCT_SYSTEM + " INTEGER);";
         //Execute the SQL statement
-        db.execSQL(SQL_CREATE_MOBILE_TABLE);
+        db.execSQL(SQL_CREATE_GAME_TABLE);
     }
 
     /**

@@ -13,20 +13,31 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-            <EditText
-                android:id="@+id/product_name_edit_text"
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/product_name_layout"
                 android:layout_width="0dp"
                 android:layout_weight="3"
                 android:layout_height="wrap_content"
-                android:hint="@string/product_name"
-                android:layout_marginRight="@dimen/med_margin_8dp"
-                />
-            <EditText
-                android:id="@+id/product_price_edit_text"
+                android:layout_marginRight="@dimen/med_margin_8dp">
+            <android.support.design.widget.TextInputEditText
+                android:id="@+id/product_name_edit_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/product_name" />
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/product_price_layout"
                 android:layout_width="0dp"
                 android:layout_weight="1.25"
+                android:layout_height="wrap_content">
+            <android.support.design.widget.TextInputEditText
+                android:id="@+id/product_price_edit_text"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:inputType="numberDecimal"
                 android:hint="@string/price"/>
+            </android.support.design.widget.TextInputLayout>
         </LinearLayout>
         <Spinner
             android:id="@+id/product_category_spinner"
@@ -79,28 +90,9 @@
             android:layout_weight="2.5"
             android:layout_height="match_parent"
             android:orientation="vertical">
-            <Spinner
-                android:id="@+id/product_supplier_name"
+            <ImageView
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/spinner_height_40dp"
-                android:layout_marginLeft="@dimen/med_margin_8dp"
-                android:layout_marginRight="@dimen/med_margin_8dp"/>
-            <TextView
-                android:id="@+id/product_supplier_phone"
-                android:layout_marginTop="@dimen/med_margin_8dp"
-                android:layout_marginLeft="@dimen/med_margin_8dp"
-                android:layout_marginRight="@dimen/med_margin_8dp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="@dimen/small_text_12sp"
-                tools:text="@string/sony_phone"/>
-            <TextView
-                android:id="@+id/product_supplier_address"
-                android:layout_margin="@dimen/med_margin_8dp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="@dimen/small_text_12sp"
-                tools:text="@string/sony_address"/>
+                android:layout_height="match_parent" />
         </LinearLayout>
     </LinearLayout>
 
