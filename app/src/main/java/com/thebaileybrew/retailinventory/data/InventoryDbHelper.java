@@ -13,7 +13,7 @@ public class InventoryDbHelper extends SQLiteOpenHelper {
     public static final String TAG = InventoryDbHelper.class.getSimpleName();
 
     /* Name of the Database file */
-    private static final String DATABASE_NAME = "gameinventory.db";
+    private static final String DATABASE_NAME = "gamingInventory.db";
 
     /* Database version. If schema is changed, the version must be incremented */
     private static final int DATABASE_VERSION = 1;
@@ -31,8 +31,10 @@ public class InventoryDbHelper extends SQLiteOpenHelper {
     */
     @Override
     public void onCreate(SQLiteDatabase db) {
-
-        //String containing the SQL statement to create the mobile table in the database
+        addInventoryTable(db);
+        addGamesTable(db);
+    }
+    private void addInventoryTable(SQLiteDatabase db) {
         String SQL_CREATE_GAME_TABLE = "CREATE TABLE " + InventoryEntry.TABLE_NAME + " ("
                 + InventoryEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + InventoryEntry.PRODUCT_NAME + " TEXT NOT NULL, "
@@ -42,6 +44,12 @@ public class InventoryDbHelper extends SQLiteOpenHelper {
         //Execute the SQL statement
         db.execSQL(SQL_CREATE_GAME_TABLE);
     }
+    private void addGamesTable(SQLiteDatabase db) {
+        String SQL_CREATE_ALL_GAMES = "CREATE TABLE " + InventoryContract.GameEntry.TABLE_NAME + " ("
+                + InventoryContract.GameEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + InventoryContract.GameEntry.GAME_NAME + " TEXT NOT NULL);";
+        db.execSQL(SQL_CREATE_ALL_GAMES);
+    }
 
     /**
      * Called when the database needs to be upgraded. The implementation
@@ -50,6 +58,21 @@ public class InventoryDbHelper extends SQLiteOpenHelper {
      */
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        if (newVersion > oldVersion) {
+            dropInventoryTable(db);
+            dropGameTable(db);
+        }
+        onCreate(db);
 
+    }
+
+    private void dropGameTable(SQLiteDatabase db) {
+        String sql = "DROP TABLE IF EXISTS " + InventoryContract.GameEntry.TABLE_NAME;
+        db.execSQL(sql);
+    }
+
+    private void dropInventoryTable(SQLiteDatabase db) {
+        String sql = "DROP TABLE IF EXISTS " + InventoryEntry.TABLE_NAME;
+        db.execSQL(sql);
     }
 }

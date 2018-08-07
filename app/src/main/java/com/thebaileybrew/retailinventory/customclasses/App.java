@@ -1,15 +1,22 @@
 package com.thebaileybrew.retailinventory.customclasses;
 
 import android.app.Application;
+import android.content.Context;
 import android.text.TextUtils;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
+import com.android.volley.VolleyError;
 import com.android.volley.toolbox.Volley;
+import com.igdb.api_android_java.callback.onSuccessCallback;
+import com.igdb.api_android_java.model.APIWrapper;
+import com.igdb.api_android_java.model.Parameters;
+
+import org.json.JSONArray;
 
 public class App extends Application {
     public static final String TAG = App.class.getSimpleName();
-
+    JSONArray jsonArrayData = null;
     private RequestQueue mRequestQueue;
 
     private static App mInstance;
@@ -20,7 +27,8 @@ public class App extends Application {
         mInstance = this;
     }
 
-    public static synchronized App getInstance() {
+
+    /*public static synchronized App getInstance() {
         return mInstance;
     }
 
@@ -46,5 +54,5 @@ public class App extends Application {
         if (mRequestQueue != null) {
             mRequestQueue.cancelAll(tag);
         }
-    }
+    }*/
 }

@@ -26,6 +26,11 @@ import android.widget.CursorAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.VolleyError;
+import com.igdb.api_android_java.callback.onSuccessCallback;
+import com.igdb.api_android_java.model.APIWrapper;
+import com.igdb.api_android_java.model.Parameters;
+import com.thebaileybrew.retailinventory.QueryPull.QueryUtils;
 import com.thebaileybrew.retailinventory.customclasses.CustomOnClickInterface;
 import com.thebaileybrew.retailinventory.customclasses.RecyclerItemTouchHelpListener;
 import com.thebaileybrew.retailinventory.customclasses.RecyclerItemTouchListener;
@@ -33,10 +38,14 @@ import com.thebaileybrew.retailinventory.data.InventoryContract;
 import com.thebaileybrew.retailinventory.data.InventoryCursorAdapter;
 import com.thebaileybrew.retailinventory.data.InventoryDbHelper;
 
+import org.json.JSONArray;
+
 import static com.thebaileybrew.retailinventory.data.InventoryContract.*;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
+
+    JSONArray defaultData;
 
     CoordinatorLayout cLayout;
     InventoryCursorAdapter inventoryCursorAdapter;
@@ -48,7 +57,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         cLayout = findViewById(R.id.coordinator_layout);
-
+        buildJSONWrapperData();
+        fillGameDatabase();
 
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -59,6 +69,34 @@ public class MainActivity extends AppCompatActivity {
             }
         });
             }
+
+    private void fillGameDatabase() {
+        if (defaultData == null) {
+            Toast.makeText(this, "No Game Data To Load", Toast.LENGTH_SHORT).show();
+        } else {
+            QueryUtils.extractDataFromJson(this, defaultData);
+            Toast.makeText(this, "Game Data Loading...", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private JSONArray buildJSONWrapperData() {
+        APIWrapper wrapper = new APIWrapper(getApplicationContext(),
+                "b17a7ed807508e288ae595268a567716");
+        Parameters params = new Parameters().addFields("games");
+
+        wrapper.games(params, new onSuccessCallback() {
+            @Override
+            public void onSuccess(JSONArray jsonArray) {
+                defaultData = jsonArray;
+            }
+
+            @Override
+            public void onError(VolleyError volleyError) {
+                defaultData = null;
+            }
+        });
+        return defaultData;
+    }
 
     @Override
     protected void onStart() {

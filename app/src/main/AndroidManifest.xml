@@ -28,7 +28,8 @@
         <provider
             android:authorities="com.thebaileybrew.retailinventory"
             android:name=".data.InventoryProvider"
-            android:exported="false" />
+            android:exported="false"
+            android:syncable="true"/>
     </application>
 
 </manifest>

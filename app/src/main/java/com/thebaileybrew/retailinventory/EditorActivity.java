@@ -1,12 +1,10 @@
 package com.thebaileybrew.retailinventory;
 
 import android.content.ContentValues;
-import android.database.sqlite.SQLiteDatabase;
-import android.graphics.PorterDuff;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
@@ -16,30 +14,33 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.thebaileybrew.retailinventory.QueryPull.Game;
+import com.thebaileybrew.retailinventory.customclasses.TextInputAutoCompleteTextView;
 import com.thebaileybrew.retailinventory.data.InventoryContract;
-import com.thebaileybrew.retailinventory.data.InventoryDbHelper;
+
+import java.util.List;
 
 import static com.thebaileybrew.retailinventory.data.InventoryContract.*;
 
 public class EditorActivity extends AppCompatActivity {
     private static final String TAG = EditorActivity.class.getSimpleName();
+    public ArrayAdapter<Game> productAdapter;
+    String[] gameNames;
+    public List<Game> GameData;
     Boolean allValidData = false;
     Boolean validName = false, validPrice = false, validQuantity = false;
-    private TextInputEditText mProductName;
+    private AutoCompleteTextView mProductName;
     private TextInputLayout mProductNameLayout;
     private Spinner mProductCategory;
-    private TextInputEditText mProductPrice;
+    private AutoCompleteTextView mProductPrice;
     private TextInputLayout mProductPriceLayout;
     private TextView mProductQuantity;
-    private Spinner mProductSupplier;
-    private TextView mProductSupplierPhone;
-    private TextView mProductSupplierAddress;
     private Button increaseQuantity;
     private Button decreaseQuantity;
 
@@ -54,6 +55,8 @@ public class EditorActivity extends AppCompatActivity {
         increaseQuantity = findViewById(R.id.increase_qty);
         decreaseQuantity = findViewById(R.id.decrease_qty);
         mProductName = findViewById(R.id.product_name_edit_text); //ET - String
+        productAdapter = new ArrayAdapter<>(this,R.layout.support_simple_spinner_dropdown_item);
+        mProductName.setAdapter(productAdapter);
         mProductNameLayout = findViewById(R.id.product_name_layout);
         mProductCategory = findViewById(R.id.product_category_spinner); //Spinner - variable direct
         mProductPrice = findViewById(R.id.product_price_edit_text); //ET - String
@@ -64,6 +67,7 @@ public class EditorActivity extends AppCompatActivity {
         increaseQty();
         decreaseQty();
     }
+
 
     private void decreaseQty() {
         decreaseQuantity.setOnClickListener(new View.OnClickListener() {
@@ -131,12 +135,12 @@ public class EditorActivity extends AppCompatActivity {
     }
 
     private void insertInventory() {
+        String currentItem = mProductName.getText().toString().trim();
         //Validate product name
-        if(mProductName.getText().toString().trim().equalsIgnoreCase("")) {
+        if(currentItem.equalsIgnoreCase("")) {
             mProductNameLayout.setError("This field cannot be blank");
-        } else if (!mProductName.getText().toString().trim().equalsIgnoreCase("Ghost Recon")) {
-            //TODO: Validate against JSON Query
-            mProductNameLayout.setError("Name must be a valid video game");
+        } else if (checkJSON(currentItem)) {
+            mProductNameLayout.setError("This must be a valid game title");
         } else {
             validName = true;
         }
@@ -171,8 +175,8 @@ public class EditorActivity extends AppCompatActivity {
         String productQuantity = mProductQuantity.getText().toString();
 
         if (allValidData) {
-            InventoryDbHelper mDbHelper = new InventoryDbHelper(this);
-            SQLiteDatabase db = mDbHelper.getWritableDatabase();
+            //InventoryDbHelper mDbHelper = new InventoryDbHelper(this);
+            //SQLiteDatabase db = mDbHelper.getWritableDatabase();
             ContentValues values = new ContentValues();
             values.put(InventoryEntry.PRODUCT_NAME, productName);
             values.put(InventoryEntry.PRODUCT_PRICE, productPrice);
@@ -190,6 +194,24 @@ public class EditorActivity extends AppCompatActivity {
         }
 
     }
+
+    private boolean checkJSON(String currentItem) {
+        String searching = "game=? ";
+        String [] searchData = {currentItem};
+        String[] projection = {GameEntry.GAME_NAME};
+        Cursor cursor = getContentResolver().query(GameEntry.CONTENT_URI,
+                projection,
+                searching,
+                searchData,
+                null);
+        if (cursor != null) {
+            cursor.close();
+            return true;
+        } else {
+            return false;
+        }
+    }
+
 
     //Menu specific options
     @Override

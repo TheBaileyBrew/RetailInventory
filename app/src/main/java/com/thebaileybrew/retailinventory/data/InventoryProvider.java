@@ -26,18 +26,25 @@ public class InventoryProvider extends ContentProvider {
     private InventoryDbHelper mDbHelper;
     private static final int INVENTORY = 100;
     private static final int INVENTORY_ID = 101;
-
-    private static final UriMatcher sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
-
-    static {
-        sUriMatcher.addURI(InventoryContract.InventoryEntry.CONTENT_AUTHORITY, InventoryContract.InventoryEntry.PATH_INVENTORY, 100);
-        sUriMatcher.addURI(InventoryContract.InventoryEntry.CONTENT_AUTHORITY, InventoryContract.InventoryEntry.PATH_INVENTORY + "/#", 101);
-    }
+    private static final int GAMES = 200;
+    private static final int GAMES_NAME = 201;
+    private static final UriMatcher sUriMatcher = buildUriMatcher();
 
     @Override
     public boolean onCreate() {
         mDbHelper = new InventoryDbHelper(getContext());
         return true;
+    }
+
+    public static UriMatcher buildUriMatcher(){
+        String content = InventoryContract.CONTENT_AUTHORITY;
+
+        UriMatcher sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
+        sUriMatcher.addURI(content, InventoryContract.PATH_INVENTORY, INVENTORY);
+        sUriMatcher.addURI(content, InventoryContract.PATH_INVENTORY + "/#", INVENTORY_ID);
+        sUriMatcher.addURI(content, InventoryContract.PATH_GAMES, GAMES);
+        sUriMatcher.addURI(content, InventoryContract.PATH_GAMES + "/*", GAMES_NAME);
+        return sUriMatcher;
     }
 
     @Nullable
@@ -48,6 +55,16 @@ public class InventoryProvider extends ContentProvider {
 
         int match = sUriMatcher.match(uri);
         switch(match) {
+            case GAMES:
+                cursor = database.query(InventoryContract.GameEntry.TABLE_NAME, projection,
+                        selection,selectionArgs,null,null,sortOrder);
+                break;
+            case GAMES_NAME:
+                selection = InventoryContract.GameEntry.GAME_NAME + "=?";
+                selectionArgs = new String [] {String.valueOf(ContentUris.parseId(uri)) };
+                cursor = database.query(InventoryContract.GameEntry.TABLE_NAME, projection,
+                        selection, selectionArgs, null, null, sortOrder);
+                break;
             case INVENTORY:
                 cursor = database.query(InventoryContract.InventoryEntry.TABLE_NAME, projection,
                         selection, selectionArgs,null,null,sortOrder);
@@ -73,6 +90,10 @@ public class InventoryProvider extends ContentProvider {
                 return InventoryContract.InventoryEntry.CONTENT_LIST_TYPE;
             case INVENTORY_ID:
                 return InventoryContract.InventoryEntry.CONTENT_ITEM_TYPE;
+            case GAMES:
+                return InventoryContract.GameEntry.CONTENT_LIST_TYPE;
+            case GAMES_NAME:
+                return InventoryContract.GameEntry.CONTENT_ITEM_TYPE;
             default:
                 throw new IllegalStateException("Unknown URI " + uri + " with match " + match);
         }
@@ -81,41 +102,32 @@ public class InventoryProvider extends ContentProvider {
     @Nullable
     @Override
     public Uri insert(@NonNull Uri uri, @Nullable ContentValues values) {
+        final SQLiteDatabase db = mDbHelper.getWritableDatabase();
         final int match = sUriMatcher.match(uri);
+        long _id;
+        Uri returnUri;
         switch (match) {
+            case GAMES:
+                _id = db.insert(InventoryContract.GameEntry.TABLE_NAME, null, values);
+                if (_id > 0) {
+                    returnUri = InventoryContract.GameEntry.buildGameUri(_id);
+                } else {
+                    throw new UnsupportedOperationException("Unable to insert row into: " + uri);
+                }
+                break;
             case INVENTORY:
-                return insertInventory(uri, values);
-            case INVENTORY_ID:
+                _id = db.insert(InventoryContract.InventoryEntry.TABLE_NAME, null, values);
+                if (_id > 0) {
+                    returnUri = InventoryContract.InventoryEntry.buildInventoryUri(_id);
+                } else {
+                    throw new UnsupportedOperationException("Unable to insert row into: " + uri);
+                }
+                break;
+            default:
                 throw new IllegalArgumentException("Insertion is not supported for " + uri);
         }
-        return null;
-    }
-    private Uri insertInventory(Uri uri, ContentValues values) {
-        //Check for null item name
-        String itemName = values.getAsString(InventoryContract.InventoryEntry.PRODUCT_NAME);
-        //if (TextUtils.isEmpty(itemName)) {
-        //    throw new IllegalArgumentException("Item must have a name");
-        //}
-        //Check for zero quantity
-        int itemQty = values.getAsInteger(InventoryContract.InventoryEntry.PRODUCT_QTY);
-        //if (itemQty == 0) {
-        //    throw new IllegalArgumentException("Item must have a quantity");
-        //}
-        //Checks for valid price
-        String itemPrice = values.getAsString(InventoryContract.InventoryEntry.PRODUCT_PRICE);
-        //if(TextUtils.isEmpty(itemPrice)) {
-        //    throw new IllegalArgumentException("Item must have a price");
-        //}
-
-        SQLiteDatabase database = mDbHelper.getWritableDatabase();
-        long id = database.insert(InventoryContract.InventoryEntry.TABLE_NAME, null, values);
-
-        //Once the ID is known, return the new URI
-        if (id == -1) {
-            Log.e(LOG_TAG, "Failed to insert row for " + uri);
-            return null;
-        }
-        return ContentUris.withAppendedId(uri, id);
+        getContext().getContentResolver().notifyChange(uri, null);
+        return returnUri;
     }
 
     @Override
