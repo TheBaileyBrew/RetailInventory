@@ -20,7 +20,7 @@
                 android:layout_height="wrap_content"
                 android:hint="@string/product_name"
                 android:layout_marginRight="@dimen/med_margin_8dp">
-            <AutoCompleteTextView
+            <com.thebaileybrew.retailinventory.customclasses.TextInputAutoCompleteTextView
                 android:id="@+id/product_name_edit_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
@@ -32,7 +32,7 @@
                 android:layout_weight="1.25"
                 android:hint="@string/price"
                 android:layout_height="wrap_content">
-            <AutoCompleteTextView
+            <com.thebaileybrew.retailinventory.customclasses.TextInputAutoCompleteTextView
                 android:id="@+id/product_price_edit_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

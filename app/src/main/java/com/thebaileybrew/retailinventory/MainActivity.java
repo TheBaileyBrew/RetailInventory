@@ -3,6 +3,7 @@ package com.thebaileybrew.retailinventory;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.AssetManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Canvas;
@@ -57,8 +58,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         cLayout = findViewById(R.id.coordinator_layout);
-        buildJSONWrapperData();
-        fillGameDatabase();
+        fillGameDatabase(defaultData);
 
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -70,32 +70,13 @@ public class MainActivity extends AppCompatActivity {
         });
             }
 
-    private void fillGameDatabase() {
+    private void fillGameDatabase(JSONArray defaultData) {
         if (defaultData == null) {
             Toast.makeText(this, "No Game Data To Load", Toast.LENGTH_SHORT).show();
         } else {
-            QueryUtils.extractDataFromJson(this, defaultData);
+            QueryUtils.extractDataFromJson(this);
             Toast.makeText(this, "Game Data Loading...", Toast.LENGTH_SHORT).show();
         }
-    }
-
-    private JSONArray buildJSONWrapperData() {
-        APIWrapper wrapper = new APIWrapper(getApplicationContext(),
-                "b17a7ed807508e288ae595268a567716");
-        Parameters params = new Parameters().addFields("games");
-
-        wrapper.games(params, new onSuccessCallback() {
-            @Override
-            public void onSuccess(JSONArray jsonArray) {
-                defaultData = jsonArray;
-            }
-
-            @Override
-            public void onError(VolleyError volleyError) {
-                defaultData = null;
-            }
-        });
-        return defaultData;
     }
 
     @Override
@@ -130,13 +111,13 @@ public class MainActivity extends AppCompatActivity {
         inventoryCursorAdapter = new InventoryCursorAdapter(this, cursor, new CustomOnClickInterface() {
             @Override
             public void onItemClick(View v, int position) {
-                Toast.makeText(MainActivity.this, "Item Clicked " + String.valueOf(position), Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "Item Clicked for Update " + String.valueOf(position), Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onLongClick(View v, int position) {
                 Snackbar mySnackbar = Snackbar.make(cLayout,"Action To Take: ", Snackbar.LENGTH_LONG)
-                        .setAction("SEE MORE GAME DETAILS...", new View.OnClickListener() {
+                        .setAction("SEE GAME DETAILS...", new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 //TODO: Set the view more details

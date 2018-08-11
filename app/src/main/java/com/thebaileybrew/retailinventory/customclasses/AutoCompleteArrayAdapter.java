@@ -1,17 +1,23 @@
 package com.thebaileybrew.retailinventory.customclasses;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.CursorAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.thebaileybrew.retailinventory.EditorActivity;
 import com.thebaileybrew.retailinventory.QueryPull.Game;
 import com.thebaileybrew.retailinventory.R;
+import com.thebaileybrew.retailinventory.data.InventoryContract;
+
+import static com.thebaileybrew.retailinventory.data.InventoryProvider.*;
 
 import java.util.List;
 
@@ -20,7 +26,7 @@ public class AutoCompleteArrayAdapter extends ArrayAdapter<Game> {
 
     Context mContext;
     int mLayoutResource;
-    List<Game> objects;
+    CursorAdapter mCursor;
 
     /**
      * Constructor
@@ -28,37 +34,40 @@ public class AutoCompleteArrayAdapter extends ArrayAdapter<Game> {
      * @param context  The current context.
      * @param resource The resource ID for a layout file containing a TextView to use when
      *                 instantiating views.
-     * @param objects  The objects to represent in the ListView.
+     *
      */
-    public AutoCompleteArrayAdapter(@NonNull Context context, int resource, @NonNull List<Game> objects) {
-        super(context, resource, objects);
+    public AutoCompleteArrayAdapter(@NonNull Context context, int resource, Cursor cursor) {
+        super(context, resource);
         this.mContext = context;
         this.mLayoutResource = resource;
-        this.objects = objects;
+        this.mCursor = new CursorAdapter(mContext, cursor, 0) {
+            @Override
+            public View newView(Context context, Cursor cursor, ViewGroup parent) {
+                View currentItemView = LayoutInflater.from(context).inflate(
+                        R.layout.support_simple_spinner_dropdown_item, parent, false);
+                ViewHolder vholder = new ViewHolder(currentItemView);
+                currentItemView.setTag("holder");
+
+                return currentItemView;
+            }
+
+            @Override
+            public void bindView(View view, Context context, Cursor cursor) {
+                final ViewHolder holder = (ViewHolder) view.getTag();
+
+                String gameName = cursor.getString(cursor.getColumnIndex(InventoryContract.GameEntry.GAME_NAME));
+                holder.textViewDisplay.setText(gameName);
+            }
+        };
     }
 
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        ViewHolderItem viewHolder;
-        if (convertView == null) {
-            LayoutInflater inflater = ((EditorActivity) mContext).getLayoutInflater();
-            convertView = inflater.inflate(mLayoutResource, parent, false);
-            viewHolder = new ViewHolderItem();
-            viewHolder.textViewItem = convertView.findViewById(R.id.textViewItem);
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        public TextView textViewDisplay;
 
-            convertView.setTag(viewHolder);
-        } else {
-            viewHolder = (ViewHolderItem) convertView.getTag();
+        public ViewHolder (View itemView) {
+            super(itemView);
+            textViewDisplay = itemView.findViewById(R.id.textViewItem);
         }
-
-        Game gameItem = objects.get(position);
-        viewHolder.textViewItem.setText(gameItem.getGameName());
-
-
-        return convertView;
     }
 
-    static class ViewHolderItem {
-        TextView textViewItem;
-    }
 }

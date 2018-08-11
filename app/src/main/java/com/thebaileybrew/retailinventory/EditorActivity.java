@@ -14,15 +14,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.thebaileybrew.retailinventory.QueryPull.Game;
+import com.thebaileybrew.retailinventory.customclasses.AutoCompleteArrayAdapter;
 import com.thebaileybrew.retailinventory.customclasses.TextInputAutoCompleteTextView;
-import com.thebaileybrew.retailinventory.data.InventoryContract;
 
 import java.util.List;
 
@@ -30,15 +29,15 @@ import static com.thebaileybrew.retailinventory.data.InventoryContract.*;
 
 public class EditorActivity extends AppCompatActivity {
     private static final String TAG = EditorActivity.class.getSimpleName();
-    public ArrayAdapter<Game> productAdapter;
+    public AutoCompleteArrayAdapter productAdapter;
     String[] gameNames;
     public List<Game> GameData;
     Boolean allValidData = false;
     Boolean validName = false, validPrice = false, validQuantity = false;
-    private AutoCompleteTextView mProductName;
+    public TextInputAutoCompleteTextView mProductName;
     private TextInputLayout mProductNameLayout;
     private Spinner mProductCategory;
-    private AutoCompleteTextView mProductPrice;
+    private TextInputAutoCompleteTextView mProductPrice;
     private TextInputLayout mProductPriceLayout;
     private TextView mProductQuantity;
     private Button increaseQuantity;
@@ -55,7 +54,7 @@ public class EditorActivity extends AppCompatActivity {
         increaseQuantity = findViewById(R.id.increase_qty);
         decreaseQuantity = findViewById(R.id.decrease_qty);
         mProductName = findViewById(R.id.product_name_edit_text); //ET - String
-        productAdapter = new ArrayAdapter<>(this,R.layout.support_simple_spinner_dropdown_item);
+        GameData = getGameData();
         mProductName.setAdapter(productAdapter);
         mProductNameLayout = findViewById(R.id.product_name_layout);
         mProductCategory = findViewById(R.id.product_category_spinner); //Spinner - variable direct
@@ -66,6 +65,30 @@ public class EditorActivity extends AppCompatActivity {
         setupSpinner();
         increaseQty();
         decreaseQty();
+    }
+
+    private List<Game> getGameData() {
+        String[] projection = {GameEntry.GAME_NAME};
+        Cursor cursorGameData = getContentResolver().query(GameEntry.CONTENT_URI,
+                projection,
+                null,
+                null,
+                null);
+        if (cursorGameData != null) {
+            int dbCount = cursorGameData.getCount();
+            Toast.makeText(this, "Count of Records: " + String.valueOf(dbCount), Toast.LENGTH_SHORT).show();
+
+            if (cursorGameData.moveToFirst()) {
+                do {
+                    String gameName = cursorGameData.getString(
+                            cursorGameData.getColumnIndexOrThrow("game"));
+                    GameData.add(new Game(gameName));
+                } while (cursorGameData.moveToNext());
+            }
+            Toast.makeText(this, "Game DB Loaded", Toast.LENGTH_SHORT).show();
+            cursorGameData.close();
+        }
+        return GameData;
     }
 
 
@@ -139,8 +162,10 @@ public class EditorActivity extends AppCompatActivity {
         //Validate product name
         if(currentItem.equalsIgnoreCase("")) {
             mProductNameLayout.setError("This field cannot be blank");
-        } else if (checkJSON(currentItem)) {
+            validName = false;
+        } else if (!checkJSON(currentItem)) {
             mProductNameLayout.setError("This must be a valid game title");
+            validName = false;
         } else {
             validName = true;
         }
@@ -189,10 +214,7 @@ public class EditorActivity extends AppCompatActivity {
             } else {
                 Toast.makeText(this, getString(R.string.editor_success), Toast.LENGTH_SHORT).show();
             }
-        } else {
-            return;
         }
-
     }
 
     private boolean checkJSON(String currentItem) {

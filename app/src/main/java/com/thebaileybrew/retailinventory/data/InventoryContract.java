@@ -61,6 +61,11 @@ public final class InventoryContract {
         public final static String TABLE_NAME = "gamedetails";
         public final static String _ID = BaseColumns._ID;
         public final static String GAME_NAME = "game";
+        public final static String GAME_DEV = "developer";
+        public final static String GAME_RELEASE = "releasedate";
+        public final static String GAME_SYSTEM = "system";
+        public final static String GAME_DEV_HOME = "developercountry";
+        public final static String GAME_DEV_HQ_CITY = "developercity";
 
         public static Uri buildGameUri(long id) {
             return ContentUris.withAppendedId(BASE_CONTENT_URI, id);

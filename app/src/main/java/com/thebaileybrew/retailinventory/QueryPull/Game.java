@@ -1,25 +1,25 @@
 package com.thebaileybrew.retailinventory.QueryPull;
 
 public class Game {
-    public String gameName; //
-    public String gamePublisher; //
-    public String gameReleaseDate; //
-    public String gameGenre; //
-    public String gameAverageRating; //
+    private String gameName; //
+    private String gamePublisher; //
+    private String gameReleaseDate; //
+    private String gameGenre; //
+    private String gameSystem; //
 
-    public Game(String gameName) {
+    public Game(String gameName, String gamePublisher, String gameReleaseDate, String gameGenre, String gameSystem) {
         this.gameName = gameName;
-        //this.gamePublisher = gamePublisher;
-        //this.gameReleaseDate = gameReleaseDate;
-        //this.gameGenre = gameGenre;
-        //this.gameAverageRating = gameAverageRating;
+        this.gamePublisher = gamePublisher;
+        this.gameReleaseDate = gameReleaseDate;
+        this.gameGenre = gameGenre;
+        this.gameSystem = gameSystem;
     }
 
     public String getGameName() {
         return gameName;
     }
 
-    /*public String getGamePublisher() {
+    public String getGamePublisher() {
         return gamePublisher;
     }
 
@@ -31,7 +31,7 @@ public class Game {
         return gameGenre;
     }
 
-    public String getGameAverageRating() {
-        return gameAverageRating;
-    }*/
+    public String getGameSystem() {
+        return gameSystem;
+    }
 }
